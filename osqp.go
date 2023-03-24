@@ -2,8 +2,8 @@ package osqp
 
 /*
 
-#cgo CFLAGS: -I./osqp/include
-#cgo LDFLAGS: -L./osqp/out -losqp -Wl,-rpath=./osqp/out
+#cgo CFLAGS: -I./build/include
+#cgo LDFLAGS: -L./build/out -losqp -Wl,-rpath=./build/out
 #include "osqp.h"
 #include <stdlib.h>
 #include <stdio.h>
