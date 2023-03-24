@@ -1,23 +1,14 @@
-package osqp
+package binding
 
-/*
 
-#cgo CFLAGS: -I./osqp/include
-#cgo LDFLAGS: -L./osqp/build/out -losqp -Wl,-rpath=./osqp/build/out
-#include "osqp.h"
-#include <stdlib.h>
-#include <stdio.h>
- 
-*/
+
 import "C"
 import (
 	"fmt"
 	"unsafe"
 )
 
-
 func Init() {
-
 	// Load problem data
 	P_x := []C.c_float{4.0, 1.0, 2.0}
 	P_nnz := C.c_int(3)
@@ -77,5 +68,4 @@ func Init() {
 	if settings != nil {
 		C.c_free(unsafe.Pointer(settings))
 	}
-
 }
