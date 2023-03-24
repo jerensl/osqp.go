@@ -3,7 +3,7 @@ package osqp
 /*
 
 #cgo CFLAGS: -I./osqp/include
-#cgo LDFLAGS: -L./osqp/build/out -losqp -Wl,-rpath=./osqp/build/out
+#cgo LDFLAGS: -L./osqp/out -losqp -Wl,-rpath=./osqp/out
 #include "osqp.h"
 #include <stdlib.h>
 #include <stdio.h>
@@ -13,8 +13,11 @@ import "C"
 import (
 	"fmt"
 	"unsafe"
-)
+) 
 
+func Hello() string {
+	return "Hello"
+}
 
 func Init() {
 

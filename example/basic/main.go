@@ -5,5 +5,7 @@ import (
 )
 
 func main() {
-	osqp.Init()
+	osqp.Hello()
+
+	
 }
