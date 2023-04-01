@@ -13,19 +13,19 @@ import (
 ) 
 
 type Data struct {
-	n 		int64
-	m 		int64
-	p_x 	[]C.c_float
-	p_i 	[]C.c_int
-	p_p 	[]C.c_int
-	p_nnz	C.c_int
-	a_x 	[]C.c_float
-	a_i 	[]C.c_int
-	a_p 	[]C.c_int
-	a_nnz	C.c_int
-	q 		[]C.c_float
-	l 		[]C.c_float
-	u 		[]C.c_float
+	N 		int64
+	M 		int64
+	P_x 	[]float64
+	P_i 	[]int64
+	P_p 	[]int64
+	P_nnz	int64
+	A_x 	[]float64
+	A_i 	[]int64
+	A_p 	[]int64
+	A_nnz	int64
+	Q 		[]float64
+	L 		[]float64
+	U 		[]float64
 }
 
 type OSQPWorkSpace struct {
@@ -47,6 +47,9 @@ func NewOSQP() *OSQPWorkSpace {
 }
 
 func (o *OSQPWorkSpace) Solve() {
+	// Setup workspace
+	C.osqp_setup(&o.work, o.data, o.settings)
+	
 	C.osqp_solve(o.work)
 }
 
@@ -54,16 +57,18 @@ func (o *OSQPWorkSpace) SetData(newData Data) {
 	data := (*C.OSQPData)(C.c_malloc(C.sizeof_OSQPData))
 
 	if data != nil {
-		data.n = (C.c_int)(newData.n)
-		data.m = (C.c_int)(newData.m)
+		data.n = (C.c_int)(newData.N)
+		data.m = (C.c_int)(newData.M)
 
-		data.P = C.csc_matrix(data.n, data.n, newData.p_nnz, (*C.c_float)(unsafe.Pointer(&newData.p_x[0])), (*C.c_int)(unsafe.Pointer(&newData.p_i[0])), (*C.c_int)(unsafe.Pointer(&newData.p_p[0])))
-		data.q = (*C.c_float)(unsafe.Pointer(&newData.q))
-		data.A = C.csc_matrix(data.m, data.n, newData.a_nnz, (*C.c_float)(unsafe.Pointer(&newData.a_x[0])), (*C.c_int)(unsafe.Pointer(&newData.a_i[0])), (*C.c_int)(unsafe.Pointer(&newData.a_p[0])))
+		data.P = C.csc_matrix(data.n, data.n, (C.c_int)(newData.P_nnz), (*C.c_float)(unsafe.Pointer(&newData.P_x[0])), (*C.c_int)(unsafe.Pointer(&newData.P_i[0])), (*C.c_int)(unsafe.Pointer(&newData.P_p[0])))
+		data.q = (*C.c_float)(unsafe.Pointer(&newData.Q))
+		data.A = C.csc_matrix(data.m, data.n, (C.c_int)(newData.A_nnz), (*C.c_float)(unsafe.Pointer(&newData.A_x[0])), (*C.c_int)(unsafe.Pointer(&newData.A_i[0])), (*C.c_int)(unsafe.Pointer(&newData.A_p[0])))
 
-		data.l = (*C.c_float)(unsafe.Pointer(&newData.l[0]))
-		data.u = (*C.c_float)(unsafe.Pointer(&newData.u[0]))
+		data.l = (*C.c_float)(unsafe.Pointer(&newData.L[0]))
+		data.u = (*C.c_float)(unsafe.Pointer(&newData.U[0]))
 	}
+
+	o.data = data
 }
 
 func (o *OSQPWorkSpace) CleanUp() {
