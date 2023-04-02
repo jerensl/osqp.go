@@ -36,10 +36,12 @@ type OSQPWorkSpace struct {
 
 func NewOSQP() *OSQPWorkSpace {
 	settings := (*C.OSQPSettings)(C.c_malloc(C.sizeof_OSQPSettings))
-
+ 
 	if settings != nil {
 		C.osqp_set_default_settings(settings)
 	}
+
+	settings.verbose = 0
 
 	return &OSQPWorkSpace{
 		settings: settings,
