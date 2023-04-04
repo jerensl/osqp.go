@@ -45,7 +45,9 @@ func NewOSQP() *OSQPWorkSpace {
 		C.osqp_set_default_settings(settings)
 	}
 
-	settings.verbose = 0
+	// settings.verbose = 0
+	settings.alpha = 1.0
+
 
 	return &OSQPWorkSpace{
 		settings: settings,
