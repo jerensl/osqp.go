@@ -46,7 +46,7 @@ func NewOSQP() *OSQPWorkSpace {
 	}
 
 	// settings.verbose = 0
-	settings.alpha = 1.0
+	// settings.alpha = 1.60
 
 
 	return &OSQPWorkSpace{
@@ -54,7 +54,8 @@ func NewOSQP() *OSQPWorkSpace {
 	}
 }
 
-func (o *OSQPWorkSpace) Setup() {
+func (o *OSQPWorkSpace) Setup(newData Data) {
+	o.setData(newData)
 	C.osqp_setup(&o.work, o.data, o.settings)
 }
 
@@ -62,14 +63,14 @@ func (o *OSQPWorkSpace) Solve() {
 	C.osqp_solve(o.work)
 }
 
-func (o *OSQPWorkSpace) SetData(newData Data) {
+func (o *OSQPWorkSpace) setData(newData Data) {
 	data := (*C.OSQPData)(C.c_malloc(C.sizeof_OSQPData))
 
 	data.n = (C.c_int)(newData.N)
 	data.m = (C.c_int)(newData.M)
 
 	data.P = C.csc_matrix(data.n, data.n, (C.c_int)(newData.P_nnz), (*C.c_float)(unsafe.Pointer(&newData.P_x[0])), (*C.c_int)(unsafe.Pointer(&newData.P_i[0])), (*C.c_int)(unsafe.Pointer(&newData.P_p[0])))
-	data.q = (*C.c_float)(unsafe.Pointer(&newData.Q))
+	data.q = (*C.c_float)(unsafe.Pointer(&newData.Q[0]))
 	data.A = C.csc_matrix(data.m, data.n, (C.c_int)(newData.A_nnz), (*C.c_float)(unsafe.Pointer(&newData.A_x[0])), (*C.c_int)(unsafe.Pointer(&newData.A_i[0])), (*C.c_int)(unsafe.Pointer(&newData.A_p[0])))
 
 	data.l = (*C.c_float)(unsafe.Pointer(&newData.L[0]))

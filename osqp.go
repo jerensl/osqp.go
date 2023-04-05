@@ -17,7 +17,9 @@ func NewCSCMat(m, n int, matrix [][]float64) *sparse.CSC {
 		}
 	}
 
-	return doxMatrix.ToCSC()
+	csc := doxMatrix.ToCSC()
+
+	return csc
 }
 
 type Data struct {
@@ -44,8 +46,7 @@ func NewOSQP() *OSQPConfig {
 	return newOSQP
 }
 
-
-func (o *OSQPConfig) SetData(newData Data)  {
+func (o OSQPConfig) Setup(newData Data)  {
 	currData := binding.Data{
 		M: newData.M,
 		N: newData.N,
@@ -62,26 +63,7 @@ func (o *OSQPConfig) SetData(newData Data)  {
 		U: newData.U,
 	}
 
-	// currData := binding.Data{
-	// 	M: newData.M,
-	// 	N: newData.N,
-	// 	P_x: newData.P_mat.Data,
-	// 	P_i: newData.P_mat.Ind,
-	// 	P_p: newData.P_mat.IdxPtr,
-	// 	P_nnz: int64(newData.P_mat.NNZ),
-	// 	A_x: newData.A_mat.Data,
-	// 	A_i: newData.A_mat.Ind,
-	// 	A_p: newData.A_mat.IdxPtr,
-	// 	A_nnz: int64(newData.A_mat.NNZ),
-	// 	Q: newData.Q,
-	// 	L: newData.L,
-	// 	U: newData.U,
-	// }
-	o.bind.SetData(currData)
-}
-
-func (o OSQPConfig) Setup()  {
-	o.bind.Setup()
+	o.bind.Setup(currData)
 }
 
 func (o OSQPConfig) Solve()  {
