@@ -1,8 +1,8 @@
 package binding
 
 /*
-#cgo CFLAGS: -I../../../build/include
-#cgo LDFLAGS: -L../../../build/out -losqp -Wl,-rpath=./build/out
+#cgo CFLAGS: -I../../../libs/include
+#cgo LDFLAGS: -L../../../libs/out -losqp -Wl,-rpath=./libs/out
 #include "osqp.h"
 #include <stdlib.h>
 #include <stdio.h>
@@ -48,7 +48,6 @@ func NewOSQP() *OSQPWorkSpace {
 	// settings.verbose = 0
 	// settings.alpha = 1.60
 
-
 	return &OSQPWorkSpace{
 		settings: settings,
 	}
@@ -61,6 +60,27 @@ func (o *OSQPWorkSpace) Setup(newData Data) {
 
 func (o *OSQPWorkSpace) Solve() {
 	C.osqp_solve(o.work)
+}
+
+func (o *OSQPWorkSpace) UpdateLinCost(qNew []float64) {
+	q := (*C.c_float)(unsafe.Pointer(&qNew[0]))
+
+	C.osqp_update_lin_cost(o.work, q)
+}
+
+func (o *OSQPWorkSpace) UpdateBounds(lNew, uNew []float64) {
+	l := (*C.c_float)(unsafe.Pointer(&lNew[0]))
+	u := (*C.c_float)(unsafe.Pointer(&uNew[0]))
+
+	C.osqp_update_bounds(o.work, l, u)
+}
+
+func (o *OSQPWorkSpace) UpdatePMat(p_x	[]float64) {
+	C.osqp_update_P(o.work, (*C.c_float)(unsafe.Pointer(&p_x[0])), nil, o.data.P.nzmax)
+}
+
+func (o *OSQPWorkSpace) UpdateAMat(a_x []float64) {
+	C.osqp_update_A(o.work, (*C.c_float)(unsafe.Pointer(&a_x[0])), nil, o.data.A.nzmax)
 }
 
 func (o *OSQPWorkSpace) setData(newData Data) {

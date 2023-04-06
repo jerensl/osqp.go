@@ -70,6 +70,22 @@ func (o OSQPConfig) Solve()  {
 	o.bind.Solve()
 }
 
+func (o OSQPConfig) UpdateLinCost(qNew []float64)  {
+	o.bind.UpdateLinCost(qNew)
+}
+
+func (o OSQPConfig) UpdateBounds(lNew, uNew []float64)  {
+	o.bind.UpdateBounds(lNew, uNew)
+}
+
+func (o OSQPConfig) UpdatePMat(pNew []float64)  {
+	o.bind.UpdatePMat(pNew)
+}
+
+func (o OSQPConfig) UpdateAMat(aNew []float64)  {
+	o.bind.UpdateAMat(aNew)
+}
+
 func (o OSQPConfig) Solution() (float32, float32) {
 	return o.bind.Solution()
 }
