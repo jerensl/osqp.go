@@ -70,8 +70,6 @@ func main() {
 	x0 := mat.NewVecDense(12, []float64{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,})
 	xr := mat.NewVecDense(12, []float64{0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0,})
 
-	
-
 	_ = x0 
 	_ = xr 
 	// fmt.Println(x0)
@@ -85,6 +83,7 @@ func main() {
 	QK.Kronecker(N, Q)
 
 	RK.Kronecker(N, R)
+
 
 	row, col := QN.Dims()
 
