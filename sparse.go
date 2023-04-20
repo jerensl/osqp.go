@@ -1,6 +1,8 @@
 package osqp
 
 import (
+	"errors"
+
 	"github.com/james-bowman/sparse"
 )
 
@@ -23,18 +25,21 @@ func (s SparseMatrix) Ind() []int {
 	return s.ind
 }
 
-func NewCSCMatrix(matrix [][]float64) SparseMatrix {
+func NewCSCMatrix(matrix [][]float64) (SparseMatrix, error) {
 	sparse := SparseMatrix{
-		r: 0,
-		c: 0,
+		r: len(matrix),
+		c: len(matrix[0]),
 		indPtr: []int{0},
 		ind: []int{},
 		data: []float64{},
 	}
 
 	totalItem := 0
-	for colIdx := 0; colIdx < len(matrix[0]); colIdx++ {
-		for rowIdx := 0; rowIdx < len(matrix); rowIdx++ {
+	for colIdx := 0; colIdx < sparse.c; colIdx++ {
+		for rowIdx := 0; rowIdx < sparse.r; rowIdx++ {
+			if len(matrix[rowIdx]) != sparse.r {
+				return sparse, errors.New("size of the row is not same")
+			}
 			if matrix[rowIdx][colIdx] != 0.0 {
 				sparse.data = append(sparse.data, matrix[rowIdx][colIdx])
 				sparse.ind = append(sparse.ind, rowIdx)
@@ -44,10 +49,9 @@ func NewCSCMatrix(matrix [][]float64) SparseMatrix {
 		sparse.indPtr = append(sparse.indPtr, totalItem)
 	}
 
-	sparse.r = len(matrix)
-	sparse.c = len(matrix[0])
 
-	return sparse 
+
+	return sparse, nil
 }
 
 func NewCSCMat(m, n int, matrix [][]float64) *sparse.CSC {
