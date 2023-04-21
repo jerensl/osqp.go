@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"github.com/james-bowman/sparse"
+	"gonum.org/v1/gonum/mat"
 )
 
 type SparseMatrix struct {
@@ -30,6 +31,56 @@ func (s SparseMatrix) NNZ() int {
 	return s.nnz
 }
 
+func (s SparseMatrix) reverseMatrix(matrix [][]float64) [][]float64 {
+    rows := len(matrix)
+    cols := len(matrix[0])
+
+    reversedMatrix := make([][]float64, cols)
+    for i := range reversedMatrix {
+        reversedMatrix[i] = make([]float64, rows)
+    }
+
+    for i := 0; i < rows; i++ {
+        for j := 0; j < cols; j++ {
+            reversedMatrix[j][i] = matrix[i][j]
+        }
+    }
+
+    return reversedMatrix
+}
+
+
+func (s SparseMatrix) unmarshalFromCSC() [][]float64 {
+	pos := 0 
+
+	data := [][]float64{}
+
+
+	for col := 0; col < s.c; col++ {
+		colData := []float64{}
+		for row := 0; row < s.r; row++ {
+			if s.ind[pos] == row && pos < len(s.data) {
+				colData = append(colData, s.data[pos])
+				pos++
+			} else {
+				colData = append(colData, 0)
+			}
+		}
+		data = append(data, colData)
+	}
+
+	return s.reverseMatrix(data)
+}
+
+func (s SparseMatrix) ToDense() *mat.Dense {
+	var newMat []float64
+	matrix := s.unmarshalFromCSC()
+	for _, row := range matrix {
+		newMat = append(newMat, row...)
+    }
+	matrixDense := mat.NewDense(s.r, s.c, newMat)
+	return matrixDense
+}
 
 func NewCSCMatrix(matrix [][]float64) (SparseMatrix, error) {
 	sparse := SparseMatrix{
@@ -56,8 +107,6 @@ func NewCSCMatrix(matrix [][]float64) (SparseMatrix, error) {
 		}
 		sparse.indPtr = append(sparse.indPtr, totalItem)
 	}
-
-
 
 	return sparse, nil
 }
