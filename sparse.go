@@ -8,6 +8,7 @@ import (
 
 type SparseMatrix struct {
 	r, c 		int
+	nnz			int
 	indPtr		[]int
 	ind			[]int
 	data		[]float64
@@ -25,10 +26,16 @@ func (s SparseMatrix) Ind() []int {
 	return s.ind
 }
 
+func (s SparseMatrix) NNZ() []float64 {
+	return s.data
+}
+
+
 func NewCSCMatrix(matrix [][]float64) (SparseMatrix, error) {
 	sparse := SparseMatrix{
 		r: len(matrix),
 		c: len(matrix[0]),
+		nnz: 0,
 		indPtr: []int{0},
 		ind: []int{},
 		data: []float64{},
@@ -44,6 +51,7 @@ func NewCSCMatrix(matrix [][]float64) (SparseMatrix, error) {
 				sparse.data = append(sparse.data, matrix[rowIdx][colIdx])
 				sparse.ind = append(sparse.ind, rowIdx)
 				totalItem++
+				sparse.nnz++
 			}
 		}
 		sparse.indPtr = append(sparse.indPtr, totalItem)
