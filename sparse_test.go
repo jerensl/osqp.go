@@ -8,21 +8,38 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+type expectedData struct {
+	data	[]float64
+	ind		[]int
+	indPtr	[]int
+	nnz		int
+}
+
 func TestValidCSCMatrix(t *testing.T) {
 	testCases := []struct {
 		name			string
 		matrix			[][]float64
-		expectData		[]float64
+		expected		expectedData
 	}{
 		{
 			name: "Test new Matrix",
 			matrix: [][]float64{{4, 1}, {0, 2}},
-			expectData: []float64{4, 1, 2},
+			expected: expectedData{
+				data: []float64{4, 1, 2},
+				ind: []int{0, 0, 1},
+				indPtr: []int{0, 1, 3},
+				nnz: 3,
+			},
 		},
 		{
 			name: "Test new Matrix with float number",
 			matrix: [][]float64{{4.0, 1.0}, {0.0, 2.0}},
-			expectData: []float64{4, 1, 2},
+			expected:expectedData {
+				data: []float64{4, 1, 2},
+				ind: []int{0, 0, 1},
+				indPtr: []int{0, 1, 3},
+				nnz: 3,
+			},
 		},
 	}
 	for _, tC := range testCases {
@@ -30,7 +47,10 @@ func TestValidCSCMatrix(t *testing.T) {
 			mtrx, err := osqp.NewCSCMatrix(tC.matrix)
 			require.NoError(t, err)
 
-			assert.Equal(t, tC.expectData, mtrx.Data())
+			assert.Equal(t, tC.expected.data, mtrx.Data())
+			assert.Equal(t, tC.expected.ind, mtrx.Ind())
+			assert.Equal(t, tC.expected.indPtr, mtrx.Indptr())
+			assert.Equal(t, tC.expected.nnz, mtrx.NNZ())
 		})
 	}
 }

@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/jerensl/osqp.go"
 )
 
@@ -9,6 +11,8 @@ func main() {
 
 	p_mat := osqp.NewCSCMat(2, 2, [][]float64{{4, 1}, {0, 2}})
 	a_mat := osqp.NewCSCMat(3, 2, [][]float64{{1, 1}, {1, 0}, {0, 1}})
+
+	fmt.Println(p_mat.RawMatrix().Ind)
 
 	data := osqp.Data{
 		P_mat: p_mat,

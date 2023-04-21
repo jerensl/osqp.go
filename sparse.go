@@ -26,8 +26,8 @@ func (s SparseMatrix) Ind() []int {
 	return s.ind
 }
 
-func (s SparseMatrix) NNZ() []float64 {
-	return s.data
+func (s SparseMatrix) NNZ() int {
+	return s.nnz
 }
 
 
