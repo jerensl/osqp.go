@@ -49,7 +49,7 @@ func TestValidCSCMatrix(t *testing.T) {
 
 			assert.Equal(t, tC.expected.data, mtrx.Data())
 			assert.Equal(t, tC.expected.ind, mtrx.Ind())
-			assert.Equal(t, tC.expected.indPtr, mtrx.Indptr())
+			assert.Equal(t, tC.expected.indPtr, mtrx.IndPtr())
 			assert.Equal(t, tC.expected.nnz, mtrx.NNZ())
 		})
 	}

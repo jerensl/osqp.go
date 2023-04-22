@@ -1,9 +1,10 @@
 package main
 
 import (
+	"fmt"
 	"math"
 
-	"github.com/james-bowman/sparse"
+	"github.com/jerensl/osqp.go"
 	"gonum.org/v1/gonum/mat"
 )
 
@@ -42,12 +43,12 @@ func main() {
 
 	// Constraints
 	u0 := 10.5916
-	umin := mat.NewDense(1, 4, []float64{9.6-u0, 9.6-u0, 9.6-u0, 9.6-u0})
-	umax := mat.NewDense(1, 4, []float64{13.0-u0, 13.0-u0, 13.0-u0, 13.0-u0})
-	xmin := mat.NewDense(1, 12, []float64{-math.Pi/6, -math.Pi/6, math.Inf(-1), math.Inf(-1), math.Inf(-1), -1,
+	umin := mat.NewVecDense(4, []float64{9.6-u0, 9.6-u0, 9.6-u0, 9.6-u0})
+	umax := mat.NewVecDense(4, []float64{13.0-u0, 13.0-u0, 13.0-u0, 13.0-u0})
+	xmin := mat.NewVecDense(12, []float64{-math.Pi/6, -math.Pi/6, math.Inf(-1), math.Inf(-1), math.Inf(-1), -1,
 		math.Inf(-1), math.Inf(-1), math.Inf(-1), math.Inf(-1), math.Inf(-1), math.Inf(-1),
 	})
-	xmax := mat.NewDense(1, 12, []float64{math.Pi/6, math.Pi/6, math.Inf(1), math.Inf(1), math.Inf(1), math.Inf(1),
+	xmax := mat.NewVecDense(12, []float64{math.Pi/6, math.Pi/6, math.Inf(1), math.Inf(1), math.Inf(1), math.Inf(1),
 		math.Inf(1), math.Inf(1), math.Inf(1), math.Inf(1), math.Inf(1), math.Inf(1),	
 	})
 
@@ -57,11 +58,10 @@ func main() {
 	_ = xmax
 
 	// Objective function
-	Q := sparse.NewDIA(12,12, []float64{0., 0., 10., 10., 10., 10., 0., 0., 0., 5., 5., 5.})
+	Q := mat.NewDiagDense(12,[]float64{0., 0., 10., 10., 10., 10., 0., 0., 0., 5., 5., 5.})
 	QN := Q
-	R := sparse.NewDIA(4,4, []float64{0.1, 0.1, 0.1, 0.1})
-
-
+	R := mat.NewDiagDense(4, []float64{0.1, 0.1, 0.1, 0.1})
+	
 	_ = QN
 	_ = R
 
@@ -76,7 +76,7 @@ func main() {
 	// fmt.Println(xr)
 
 	// Prediction horizon
-	N := sparse.NewDIA(10,10, []float64{1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0})
+	N := mat.NewDiagDense(10, []float64{1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0})
 
 	var QK mat.Dense
 	var RK mat.Dense
@@ -94,32 +94,9 @@ func main() {
         }
     }
 
-	blocks := []*mat.Dense{
-       &QK,
-	   QNDense,
-	   &RK,
-    }
+	P := osqp.BlockDiag([]*mat.Dense{&QK, QNDense, &RK})
 
-    var rows int
-    var cols int
-    for _, m := range blocks {
-        r, c := m.Dims()
-        rows += r
-        cols += c
-    }
-
-	// Cast MPC problem to a QP: x = (x(0),x(1),...,x(N),u(0),...,u(N-1))
-	// - quadratic objective
-    P := mat.NewDense(rows, cols, nil)
-    rowOffset := 0
-    colOffset := 0
-    for _, m := range blocks {
-        r, c := m.Dims()
-        P.Slice(rowOffset,rowOffset+r,colOffset,colOffset+c).(*mat.Dense).Copy(m)
-        rowOffset += r
-        colOffset += c
-    }
-
+	fmt.Println(P)
 
 	// fmt.Println(RK.RawMatrix())
 
