@@ -21,6 +21,16 @@ func main() {
 		return
 	}
 
+	t_mat, err := osqp.NewDiagCSCMatrix(4, 1)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	fmt.Println(p_mat)
+	fmt.Println(p_mat.ToDense())
+	fmt.Println(t_mat.ToDense())
+
 	data := osqp.Data{
 		P_mat: p_mat,
 		Q: []float64{1.0, 1.0},

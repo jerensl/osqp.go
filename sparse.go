@@ -2,8 +2,8 @@ package osqp
 
 import (
 	"errors"
+	"fmt"
 
-	"github.com/james-bowman/sparse"
 	"gonum.org/v1/gonum/mat"
 )
 
@@ -56,8 +56,29 @@ func NewCSCMatrix(matrix [][]float64) (SparseMatrix, error) {
 		}
 		sparse.indPtr = append(sparse.indPtr, totalItem)
 	}
+	
 
 	return sparse, nil
+}
+
+func NewDiagCSCMatrix(size int, value float64) (*SparseMatrix, error) {
+	sparse := SparseMatrix{
+		r: size,
+		c: size,
+		nnz: 0,
+		indPtr: []int{},
+		ind: []int{},
+		data: []float64{},
+	}
+
+	for s := 0; s <= size; s++ {
+		sparse.data = append(sparse.data, value)
+		sparse.ind = append(sparse.ind, s)
+		sparse.indPtr = append(sparse.indPtr, s)
+		sparse.nnz++
+	}
+
+	return &sparse, nil
 }
 
 func (s SparseMatrix) Transpose(matrix [][]float64) [][]float64 {
@@ -80,24 +101,32 @@ func (s SparseMatrix) Transpose(matrix [][]float64) [][]float64 {
 
 
 func (s SparseMatrix) unmarshalFromCSC() [][]float64 {
-	pos := 0 
+	   matrix := make([][]float64, s.r)
+	   for i := range matrix {
+		   matrix[i] = make([]float64, s.c)
+	   }
+	   
+	   pos := 0
 
-	data := [][]float64{}
+	   row := 0
 
-	for col := 0; col < s.c; col++ {
-		colData := []float64{}
-		for row := 0; row < s.r; row++ {
-			if s.ind[pos] == row && pos < len(s.data) {
-				colData = append(colData, s.data[pos])
-				pos++
+	   for i := 0; i < len(s.indPtr)-1; i++ {
+			totalItemRow := s.indPtr[i+1] - s.indPtr[i]
+			if totalItemRow > 0 {
+				for totalItemRow > 0 {
+					fmt.Println(s.data[pos])
+					matrix[row][s.ind[pos]] = s.data[pos]
+					pos++
+					totalItemRow--
+				}
+				row++
 			} else {
-				colData = append(colData, 0)
+				row++
 			}
-		}
-		data = append(data, colData)
-	}
+	   }
 
-	return s.Transpose(data)
+
+	return s.Transpose(matrix)
 }
 
 func (s SparseMatrix) ToDense() *mat.Dense {
@@ -106,6 +135,7 @@ func (s SparseMatrix) ToDense() *mat.Dense {
 	for _, row := range matrix {
 		newMat = append(newMat, row...)
     }
+
 	matrixDense := mat.NewDense(s.r, s.c, newMat)
 	return matrixDense
 }
@@ -129,22 +159,4 @@ func BlockDiag(blocks []*mat.Dense) *mat.Dense {
 		 colOffset += c
 	 }
 	return result
-}
-
-func NewCSCMat(m, n int, matrix [][]float64) *sparse.CSC {
-	doxMatrix := sparse.NewDOK(m, n)
-
-	for i := 0; i < m; i++ {
-		for j := 0; j < n; j++ {
-			if matrix[i][j] != 0.0 {
-				val := matrix[i][j]
-				doxMatrix.Set(i, j, val)
-			}
-		}
-	}
-
-
-	csc := doxMatrix.ToCSC()
-
-	return csc
 }

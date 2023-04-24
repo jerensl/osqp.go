@@ -4,8 +4,6 @@ import (
 	"github.com/jerensl/osqp.go/internal/pkg/binding"
 ) 
 
-
-
 type Data struct {
 	M 		int64
 	N 		int64
