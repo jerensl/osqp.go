@@ -12,34 +12,47 @@ func main() {
 	// newOSQP := osqp.NewOSQP()
 
 	
-	// Ad := osqp.NewCSCMat(12, 12, [][]float64{
-	// 	{1.,      0.,     0., 0., 0., 0., 0.1,     0.,     0.,  0.,     0.,     0.    },
-	// 	{0.,      1.,     0., 0., 0., 0., 0.,      0.1,    0.,  0.,     0.,     0.    },
-	// 	{0.,      0.,     1., 0., 0., 0., 0.,      0.,     0.1, 0.,     0.,     0.    },
-	// 	{0.0488,  0.,     0., 1., 0., 0., 0.0016,  0.,     0.,  0.0992, 0.,     0.    },
-	// 	{0.,     -0.0488, 0., 0., 1., 0., 0.,     -0.0016, 0.,  0.,     0.0992, 0.    },
-	// 	{0.,      0.,     0., 0., 0., 1., 0.,      0.,     0.,  0.,     0.,     0.0992},
-	// 	{0.,      0.,     0., 0., 0., 0., 1.,      0.,     0.,  0.,     0.,     0.    },
-	// 	{0.,      0.,     0., 0., 0., 0., 0.,      1.,     0.,  0.,     0.,     0.    },
-	// 	{0.,      0.,     0., 0., 0., 0., 0.,      0.,     1.,  0.,     0.,     0.    },
-	// 	{0.9734,  0.,     0., 0., 0., 0., 0.0488,  0.,     0.,  0.9846, 0.,     0.    },
-	// 	{0.,     -0.9734, 0., 0., 0., 0., 0.,     -0.0488, 0.,  0.,     0.9846, 0.    },
-	// 	{0.,      0.,     0., 0., 0., 0., 0.,      0.,     0.,  0.,     0.,     0.9846},
-	// 	})
-	// Bd := osqp.NewCSCMat(4, 12, [][]float64{
-	// 	{0.,      -0.0726,  0.,     0.0726},
-	// 	{-0.0726,  0.,      0.0726, 0.    },
-	// 	{-0.0152,  0.0152, -0.0152, 0.0152},
-	// 	{-0.,     -0.0006, -0.,     0.0006},
-	// 	{0.0006,   0.,     -0.0006, 0.0000},
-	// 	{0.0106,   0.0106,  0.0106, 0.0106},
-	// 	{0,       -1.4512,  0.,     1.4512},
-	// 	{-1.4512,  0.,      1.4512, 0.    },
-	// 	{-0.3049,  0.3049, -0.3049, 0.3049},
-	// 	{-0.,     -0.0236,  0.,     0.0236},
-	// 	{0.0236,   0.,     -0.0236, 0.    },
-	// 	})
-	// nx, nu := 4, 12
+	Ad, err := osqp.NewCSCMatrix([][]float64{
+		{1.,      0.,     0., 0., 0., 0., 0.1,     0.,     0.,  0.,     0.,     0.    },
+		{0.,      1.,     0., 0., 0., 0., 0.,      0.1,    0.,  0.,     0.,     0.    },
+		{0.,      0.,     1., 0., 0., 0., 0.,      0.,     0.1, 0.,     0.,     0.    },
+		{0.0488,  0.,     0., 1., 0., 0., 0.0016,  0.,     0.,  0.0992, 0.,     0.    },
+		{0.,     -0.0488, 0., 0., 1., 0., 0.,     -0.0016, 0.,  0.,     0.0992, 0.    },
+		{0.,      0.,     0., 0., 0., 1., 0.,      0.,     0.,  0.,     0.,     0.0992},
+		{0.,      0.,     0., 0., 0., 0., 1.,      0.,     0.,  0.,     0.,     0.    },
+		{0.,      0.,     0., 0., 0., 0., 0.,      1.,     0.,  0.,     0.,     0.    },
+		{0.,      0.,     0., 0., 0., 0., 0.,      0.,     1.,  0.,     0.,     0.    },
+		{0.9734,  0.,     0., 0., 0., 0., 0.0488,  0.,     0.,  0.9846, 0.,     0.    },
+		{0.,     -0.9734, 0., 0., 0., 0., 0.,     -0.0488, 0.,  0.,     0.9846, 0.    },
+		{0.,      0.,     0., 0., 0., 0., 0.,      0.,     0.,  0.,     0.,     0.9846},
+		})
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	Bd, err := osqp.NewCSCMatrix([][]float64{
+		{0.,      -0.0726,  0.,     0.0726},
+		{-0.0726,  0.,      0.0726, 0.    },
+		{-0.0152,  0.0152, -0.0152, 0.0152},
+		{-0.,     -0.0006, -0.,     0.0006},
+		{0.0006,   0.,     -0.0006, 0.0000},
+		{0.0106,   0.0106,  0.0106, 0.0106},
+		{0,       -1.4512,  0.,     1.4512},
+		{-1.4512,  0.,      1.4512, 0.    },
+		{-0.3049,  0.3049, -0.3049, 0.3049},
+		{-0.,     -0.0236,  0.,     0.0236},
+		{0.0236,   0.,     -0.0236, 0.    },
+		{0.2107,   0.2107,  0.2107, 0.2107},
+		})
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	nx, nu := Bd.Dimension()
+
+	_ = Ad
+	_ = nx
+	_ = nu
 
 	// Constraints
 	u0 := 10.5916
@@ -61,7 +74,7 @@ func main() {
 	Q := mat.NewDiagDense(12,[]float64{0., 0., 10., 10., 10., 10., 0., 0., 0., 5., 5., 5.})
 	QN := Q
 	R := mat.NewDiagDense(4, []float64{0.1, 0.1, 0.1, 0.1})
-	
+
 	_ = QN
 	_ = R
 
@@ -72,18 +85,15 @@ func main() {
 
 	_ = x0 
 	_ = xr 
-	// fmt.Println(x0)
-	// fmt.Println(xr)
 
 	// Prediction horizon
-	N := mat.NewDiagDense(10, []float64{1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0})
+	N := 10
 
 	var QK mat.Dense
+	QK.Kronecker(osqp.DenseEye(N, 1.0), Q)
+	
 	var RK mat.Dense
-	QK.Kronecker(N, Q)
-
-	RK.Kronecker(N, R)
-
+	RK.Kronecker(osqp.DenseEye(N, 1.0), R)
 
 	row, col := QN.Dims()
 
@@ -92,13 +102,55 @@ func main() {
         for j := 0; j < col; j++ {
             QNDense.Set(i, j, QN.At(i, j))
         }
-    }
+    } 
 
+	// Cast MPC problem to a QP: x = (x(0),x(1),...,x(N),u(0),...,u(N-1))
+	// - quadratic objective
 	P := osqp.BlockDiag([]*mat.Dense{&QK, QNDense, &RK})
 
-	fmt.Println(P)
+	var QDot mat.VecDense
+	QDot.MulVec(Q, xr)
 
-	// fmt.Println(RK.RawMatrix())
+	Ones := mat.NewVecDense(10, []float64{1, 1, 1, 1, 1, 1, 1, 1, 1, 1})
+	Nnu := mat.NewVecDense(40, []float64{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0})
+
+	var QKron mat.Dense
+	QKron.Kronecker(Ones, osqp.ToNegativeVecDense(QDot))
+
+	// - linear objective
+	var hstack mat.Dense
+	var q mat.Dense
+	
+	hstack.Stack(&QKron, osqp.ToNegativeVecDense(QDot))
+	q.Stack(&hstack, Nnu)
+
+	_ = P
+
+	// - linear dynamics
+	var AxSubA mat.Dense
+	var AxSubB mat.Dense
+	var Ax mat.Dense
+
+	AxSubA.Kronecker(osqp.DenseEye(N+1, 1.0), osqp.ToNegativeDense(*osqp.DenseEye(nx, 1.0)))
+	AxSubB.Kronecker(osqp.DenseEyeK(N+1, 1.0, -1), Ad.ToDense())
+	
+	Ax.Add(&AxSubA, &AxSubB)
+	
+	CSCMat, err := osqp.NewCSCMatrix([][]float64{{0, 0, 0, 0, 0, 0, 0, 0, 0, 0,}})
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	var vstack mat.Dense
+	vstack.Stack(CSCMat.ToDense(), osqp.DenseEye(N, 1.0))
+
+	var Bu mat.Dense
+	Bu.Kronecker(&vstack, Bd.ToDense())
+
+	fmt.Println(Bd.Data())
+	// fmt.Println(Bu)
 
 	// newOSQP.Solve()
 

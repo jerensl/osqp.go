@@ -2,7 +2,6 @@ package osqp
 
 import (
 	"errors"
-	"fmt"
 
 	"gonum.org/v1/gonum/mat"
 )
@@ -31,6 +30,10 @@ func (s SparseMatrix) NNZ() int {
 	return s.nnz
 }
 
+func (s SparseMatrix) Dimension() (int, int) {
+	return s.r, s.c
+}
+
 func NewCSCMatrix(matrix [][]float64) (SparseMatrix, error) {
 	sparse := SparseMatrix{
 		r: len(matrix),
@@ -47,7 +50,7 @@ func NewCSCMatrix(matrix [][]float64) (SparseMatrix, error) {
 			if len(matrix[rowIdx]) != sparse.c {
 				return sparse, errors.New("size of the row is not same")
 			}
-			if matrix[rowIdx][colIdx] != 0.0 {
+			if matrix[rowIdx][colIdx] != 0 {
 				sparse.data = append(sparse.data, matrix[rowIdx][colIdx])
 				sparse.ind = append(sparse.ind, rowIdx)
 				totalItem++
@@ -56,7 +59,6 @@ func NewCSCMatrix(matrix [][]float64) (SparseMatrix, error) {
 		}
 		sparse.indPtr = append(sparse.indPtr, totalItem)
 	}
-	
 
 	return sparse, nil
 }
@@ -114,7 +116,9 @@ func (s SparseMatrix) unmarshalFromCSC() [][]float64 {
 			totalItemRow := s.indPtr[i+1] - s.indPtr[i]
 			if totalItemRow > 0 {
 				for totalItemRow > 0 {
-					fmt.Println(s.data[pos])
+					if s.ind[pos] >= s.c {
+						break
+					}
 					matrix[row][s.ind[pos]] = s.data[pos]
 					pos++
 					totalItemRow--
@@ -124,7 +128,6 @@ func (s SparseMatrix) unmarshalFromCSC() [][]float64 {
 				row++
 			}
 	   }
-
 
 	return s.Transpose(matrix)
 }
@@ -138,6 +141,89 @@ func (s SparseMatrix) ToDense() *mat.Dense {
 
 	matrixDense := mat.NewDense(s.r, s.c, newMat)
 	return matrixDense
+}
+
+func DenseEye(size int, val float64) *mat.Dense {
+	matrix := make([]float64, size*size)
+	
+	for i := range matrix {
+		r := i/size
+		c := i%size
+		if r == c {
+			matrix[i] = val
+		}
+	}
+
+	matDense := mat.NewDense(size, size, matrix)
+	
+	return matDense
+}
+
+func DenseEyeK(size int, val float64, k int) *mat.Dense {
+	matrix := make([]float64, size*size)
+	count := 1
+	
+	for i := range matrix {
+		r := i/size
+		c := i%size
+		if r == count && c == r+k {
+			matrix[i] = val
+			count++
+		}
+	}
+
+	matDense := mat.NewDense(size, size, matrix)
+	
+	return matDense
+}
+
+func ToNegativeDense(vecDense mat.Dense) *mat.Dense {
+	row, col := vecDense.Dims()
+
+	newMat := []float64{}
+
+	for c := 0; c < col; c++ {
+		for r := 0; r < row; r++ {
+			newMat = append(newMat, -vecDense.At(r, c))
+		}
+	}
+
+	newDense := mat.NewDense(row, col, newMat)
+
+	return newDense
+}
+
+func VStack(matrix []mat.Matrix) *mat.Dense {
+	rows := 0
+	cols := 0
+
+	var newMatrix *mat.Dense
+	
+	for i := range matrix {
+		r, c := matrix[i].Dims()
+		rows += r
+		cols += c
+
+		newMatrix.Copy(matrix[i])
+	}
+
+	return newMatrix
+}
+
+func ToNegativeVecDense(vecDense mat.VecDense) *mat.Dense {
+	row, col := vecDense.Dims()
+
+	newMat := []float64{}
+
+	for c := 0; c < col; c++ {
+		for r := 0; r < row; r++ {
+			newMat = append(newMat, -vecDense.At(r, c))
+		}
+	}
+
+	newDense := mat.NewDense(row, col, newMat)
+
+	return newDense
 }
 
 func BlockDiag(blocks []*mat.Dense) *mat.Dense { 
