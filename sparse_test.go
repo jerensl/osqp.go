@@ -32,6 +32,23 @@ func TestValidCSCMatrix(t *testing.T) {
 			},
 		},
 		{
+			name: "Test new Matrix with bigger size",
+			matrix: [][]float64{
+				{8, 0, 2, 0, 0},
+				{0, 0, 5, 0, 0},
+				{0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0},
+				{0, 0, 7, 1, 2},
+				{0, 0, 0, 0, 0},
+				{0, 0, 0, 9, 0}},
+			expected:expectedData {
+				data: []float64{8, 2, 5, 7, 1, 9, 2},
+				ind: []int{0, 0, 1, 4, 4, 6, 4},
+				indPtr: []int{0, 1, 1, 4, 6, 7},
+				nnz: 7,
+			},
+		},
+		{
 			name: "Test new Matrix with float number",
 			matrix: [][]float64{{4.0, 1.0}, {0.0, 2.0}},
 			expected:expectedData {

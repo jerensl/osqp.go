@@ -108,28 +108,25 @@ func (s SparseMatrix) unmarshalFromCSC() [][]float64 {
 		   matrix[i] = make([]float64, s.c)
 	   }
 	   
-	   pos := 0
+	   indPos := 0
 
-	   row := 0
+	   col := 0
 
 	   for i := 0; i < len(s.indPtr)-1; i++ {
-			totalItemRow := s.indPtr[i+1] - s.indPtr[i]
-			if totalItemRow > 0 {
-				for totalItemRow > 0 {
-					if s.ind[pos] >= s.c {
-						break
-					}
-					matrix[row][s.ind[pos]] = s.data[pos]
-					pos++
-					totalItemRow--
+			totalNumInRow := s.indPtr[i+1] - s.indPtr[i]
+			if totalNumInRow > 0 {
+				for totalNumInRow > 0 {
+					matrix[s.ind[indPos]][col] = s.data[indPos]
+					indPos++
+					totalNumInRow--
 				}
-				row++
+				col++
 			} else {
-				row++
+				col++
 			}
 	   }
 
-	return s.Transpose(matrix)
+	return matrix
 }
 
 func (s SparseMatrix) ToDense() *mat.Dense {
@@ -218,6 +215,38 @@ func ToNegativeVecDense(vecDense mat.VecDense) *mat.Dense {
 	for c := 0; c < col; c++ {
 		for r := 0; r < row; r++ {
 			newMat = append(newMat, -vecDense.At(r, c))
+		}
+	}
+
+	newDense := mat.NewDense(row, col, newMat)
+
+	return newDense
+}
+
+func VecZeros(num int) mat.Matrix {
+	items := []float64{}
+
+	for i := 0; i < num; i++ {
+		items = append(items, 0)
+	}
+
+	newVec := mat.NewVecDense(num, items)
+	
+	return newVec
+}
+
+func ToNegative(matDense mat.Matrix) mat.Matrix {
+	return toNegative(matDense)
+}
+
+func toNegative(matDense mat.Matrix) mat.Matrix {
+	row, col := matDense.Dims()
+
+	newMat := []float64{}
+
+	for c := 0; c < col; c++ {
+		for r := 0; r < row; r++ {
+			newMat = append(newMat, -matDense.At(r, c))
 		}
 	}
 

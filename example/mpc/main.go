@@ -50,10 +50,6 @@ func main() {
 	}
 	nx, nu := Bd.Dimension()
 
-	_ = Ad
-	_ = nx
-	_ = nu
-
 	// Constraints
 	u0 := 10.5916
 	umin := mat.NewVecDense(4, []float64{9.6-u0, 9.6-u0, 9.6-u0, 9.6-u0})
@@ -65,26 +61,15 @@ func main() {
 		math.Inf(1), math.Inf(1), math.Inf(1), math.Inf(1), math.Inf(1), math.Inf(1),	
 	})
 
-	_ = umin
-	_ = umax
-	_ = xmin
-	_ = xmax
-
 	// Objective function
 	Q := mat.NewDiagDense(12,[]float64{0., 0., 10., 10., 10., 10., 0., 0., 0., 5., 5., 5.})
 	QN := Q
 	R := mat.NewDiagDense(4, []float64{0.1, 0.1, 0.1, 0.1})
 
-	_ = QN
-	_ = R
-
 	
 	// Initial and reference states
 	x0 := mat.NewVecDense(12, []float64{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,})
 	xr := mat.NewVecDense(12, []float64{0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0,})
-
-	_ = x0 
-	_ = xr 
 
 	// Prediction horizon
 	N := 10
@@ -148,9 +133,44 @@ func main() {
 
 	var Bu mat.Dense
 	Bu.Kronecker(&vstack, Bd.ToDense())
+	var Aeq mat.Dense
+	Aeq.Stack(&Ax, (&Bu).T())
+	var leq mat.Dense
+	leq.Stack(osqp.ToNegative(x0), osqp.VecZeros(N*nx))
+	ueq := leq
 
-	fmt.Println(Bd.Data())
-	// fmt.Println(Bu)
+	// - input and state constraints
+	Aineq := osqp.DenseEye((N+1)*nx+N*nu, 1.0)
+	var lineq mat.Dense
+	var lineqKron mat.Dense
+	lineqKron.Kronecker(osqp.VecZeros(N+1), xmin)
+	var lineqKronTwo mat.Dense
+	lineqKronTwo.Kronecker(osqp.VecZeros(N), umin)
+	lineq.Stack(&lineqKron, &lineqKronTwo)
+
+	var uineqKron mat.Dense
+	uineqKron.Kronecker(osqp.VecZeros(N+1), xmax)
+	var uineqKronTwo mat.Dense
+	uineqKronTwo.Kronecker(osqp.VecZeros(N), umax)
+	var uineq mat.Dense
+	uineq.Stack(&uineqKron, &uineqKronTwo)
+
+	_ = Aineq
+	// - OSQP constraints
+	var A mat.Dense
+	var l mat.Dense
+	var u mat.Dense
+
+	A.Stack((&Aeq).T(), Aineq) 
+	l.Stack(&leq, &lineq)
+	u.Stack(&ueq, &uineq)
+
+
+	nsim := 15
+
+	for i := 1; i < nsim; i++ {
+
+	}
 
 	// newOSQP.Solve()
 
