@@ -8,7 +8,7 @@ import (
 
 type SparseMatrix struct {
 	r, c 		int
-	nnz			int
+	nnz			int64
 	indPtr		[]int
 	ind			[]int
 	data		[]float64
@@ -26,7 +26,7 @@ func (s SparseMatrix) Ind() []int {
 	return s.ind
 }
 
-func (s SparseMatrix) NNZ() int {
+func (s SparseMatrix) NNZ() int64 {
 	return s.nnz
 }
 

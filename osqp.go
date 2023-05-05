@@ -30,8 +30,8 @@ func NewOSQP() *OSQPConfig {
 
 func (o OSQPConfig) Setup(p SparseMatrix, q []float64, a SparseMatrix, l []float64, u []float64)  {
 	currData := binding.Data{
-		M: p.r,
-		N: a.c,
+		M: int64(a.r),
+		N: int64(p.r),
 		P_x: p.Data(),
 		P_i: p.Ind(),
 		P_p: p.IndPtr(),

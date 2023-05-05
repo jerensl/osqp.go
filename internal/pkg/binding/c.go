@@ -13,16 +13,16 @@ import (
 ) 
 
 type Data struct {
-	N 		int
-	M 		int
+	N 		int64
+	M 		int64
 	P_x 	[]float64
 	P_i 	[]int
 	P_p 	[]int
-	P_nnz	int
+	P_nnz	int64
 	A_x 	[]float64
 	A_i 	[]int
 	A_p 	[]int
-	A_nnz	int
+	A_nnz	int64
 	Q 		[]float64
 	L 		[]float64
 	U 		[]float64
