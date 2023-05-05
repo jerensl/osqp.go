@@ -8,8 +8,8 @@ type Data struct {
 	M 		int64
 	N 		int64
 	P_mat 	SparseMatrix
-	A_mat 	SparseMatrix
 	Q		[]float64
+	A_mat 	SparseMatrix
 	L		[]float64
 	U		[]float64
 }
@@ -28,21 +28,21 @@ func NewOSQP() *OSQPConfig {
 	return newOSQP
 }
 
-func (o OSQPConfig) Setup(newData Data)  {
+func (o OSQPConfig) Setup(p SparseMatrix, q []float64, a SparseMatrix, l []float64, u []float64)  {
 	currData := binding.Data{
-		M: newData.M,
-		N: newData.N,
-		P_x: newData.P_mat.Data(),
-		P_i: newData.P_mat.Ind(),
-		P_p: newData.P_mat.IndPtr(),
-		P_nnz: int64(newData.P_mat.NNZ()),
-		A_x: newData.A_mat.Data(),
-		A_i: newData.A_mat.Ind(),
-		A_p: newData.A_mat.IndPtr(),
-		A_nnz: int64(newData.A_mat.NNZ()),
-		Q: newData.Q,
-		L: newData.L,
-		U: newData.U,
+		M: p.r,
+		N: a.c,
+		P_x: p.Data(),
+		P_i: p.Ind(),
+		P_p: p.IndPtr(),
+		P_nnz: p.NNZ(),
+		Q: q,
+		A_x: a.Data(),
+		A_i: a.Ind(),
+		A_p: a.IndPtr(),
+		A_nnz: a.NNZ(),
+		L: l,
+		U: u,
 	}
 
 	o.bind.Setup(currData)

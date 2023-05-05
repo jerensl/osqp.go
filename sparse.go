@@ -63,6 +63,34 @@ func NewCSCMatrix(matrix [][]float64) (SparseMatrix, error) {
 	return sparse, nil
 }
 
+func NewCSCDenseMatrix(matrix mat.Matrix) (SparseMatrix, error) {
+	row, col := matrix.Dims()
+	
+	sparse := SparseMatrix{
+		r: row,
+		c: col,
+		nnz: 0,
+		indPtr: []int{0},
+		ind: []int{},
+		data: []float64{},
+	}
+
+	totalItem := 0
+	for colIdx := 0; colIdx < sparse.c; colIdx++ {
+		for rowIdx := 0; rowIdx < sparse.r; rowIdx++ {
+			if matrix.At(rowIdx, colIdx) != 0 {
+				sparse.data = append(sparse.data, matrix.At(rowIdx,colIdx))
+				sparse.ind = append(sparse.ind, rowIdx)
+				totalItem++
+				sparse.nnz++
+			}
+		}
+		sparse.indPtr = append(sparse.indPtr, totalItem)
+	}
+
+	return sparse, nil
+}
+
 func NewDiagCSCMatrix(size int, value float64) (*SparseMatrix, error) {
 	sparse := SparseMatrix{
 		r: size,

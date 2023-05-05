@@ -13,16 +13,16 @@ import (
 ) 
 
 type Data struct {
-	N 		int64
-	M 		int64
+	N 		int
+	M 		int
 	P_x 	[]float64
 	P_i 	[]int
 	P_p 	[]int
-	P_nnz	int64
+	P_nnz	int
 	A_x 	[]float64
 	A_i 	[]int
 	A_p 	[]int
-	A_nnz	int64
+	A_nnz	int
 	Q 		[]float64
 	L 		[]float64
 	U 		[]float64
@@ -44,9 +44,6 @@ func NewOSQP() *OSQPWorkSpace {
 	if settings != nil {
 		C.osqp_set_default_settings(settings)
 	}
-
-	// settings.verbose = 0
-	// settings.alpha = 1.60
 
 	return &OSQPWorkSpace{
 		settings: settings,
