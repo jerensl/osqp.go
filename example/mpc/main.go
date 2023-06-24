@@ -9,8 +9,7 @@ import (
 )
 
 func main() {
-	// newOSQP := osqp.NewOSQP()
-
+	qp := osqp.NewOSQP()
 	
 	Ad, err := osqp.NewCSCMatrix([][]float64{
 		{1.,      0.,     0., 0., 0., 0., 0.1,     0.,     0.,  0.,     0.,     0.    },
@@ -65,7 +64,6 @@ func main() {
 	Q := mat.NewDiagDense(12,[]float64{0., 0., 10., 10., 10., 10., 0., 0., 0., 5., 5., 5.})
 	QN := Q
 	R := mat.NewDiagDense(4, []float64{0.1, 0.1, 0.1, 0.1})
-
 	
 	// Initial and reference states
 	x0 := mat.NewVecDense(12, []float64{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,})
@@ -166,14 +164,26 @@ func main() {
 	u.Stack(&ueq, &uineq)
 
 
-	nsim := 15
-
-	for i := 1; i < nsim; i++ {
-
+	p, err := osqp.NewCSCDenseMatrix(P)
+	if err != nil {
+		fmt.Println(err)
+		return
 	}
 
-	// newOSQP.Solve()
+	a, err := osqp.NewCSCDenseMatrix(&A)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 
-	// newOSQP.CleanUp()
+	qp.Setup(p, q.RawMatrix().Data, a, l.RawMatrix().Data, u.RawMatrix().Data)
+
+		qp.Solve()
+		x, y := qp.Solution()
+
+		fmt.Println(x)
+		fmt.Println(y)
+
+	qp.CleanUp()
 }
 

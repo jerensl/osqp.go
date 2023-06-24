@@ -9,6 +9,7 @@ package binding
 */
 import "C"
 import (
+	"fmt"
 	"unsafe"
 ) 
 
@@ -35,8 +36,22 @@ type OSQPWorkSpace struct {
 }
 
 func (o OSQPWorkSpace) Solution() (float32, float32) {
+	// Extract solution
+    x_ptr := unsafe.Pointer(o.work.solution.x)
+    x_len := int(o.data.n)
+    x_cap := int(o.data.n)
+    x_slice := (*[1 << 30]C.double)(x_ptr)[:x_len:x_cap]
+    x := make([]float64, x_len)
+    for i := range x {
+        x[i] = float64(x_slice[i])
+        fmt.Printf("x[%d] = %f\n", i+1, x[i])
+    }
+
+	fmt.Println(x)
+	
 	return float32(*o.work.solution.x), float32(*o.work.solution.y)
 }
+
 
 func NewOSQP() *OSQPWorkSpace {
 	settings := (*C.OSQPSettings)(C.c_malloc(C.sizeof_OSQPSettings))
