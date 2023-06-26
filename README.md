@@ -22,8 +22,8 @@
 - [⛓️ Dependencies / Limitations ](#️-dependencies--limitations-)
 - [🚀 Future Scope ](#-future-scope-)
 - [🏁 Getting Started ](#-getting-started-)
-  - [Prerequisites](#prerequisites)
-  - [Installing](#installing)
+	- [Prerequisites](#prerequisites)
+	- [Installing](#installing)
 - [🎈 Usage ](#-usage-)
 - [⛏️ Built With ](#️-built-with-)
 - [✍️ Authors ](#️-authors-)
@@ -47,21 +47,18 @@ Write about what you could not develop during the course of the project; and abo
 in the future.
 
 ## 🏁 Getting Started <a name = "getting_started"></a>
-These instructions will get you a copy of the project up and running on your local machine for development 
-and testing purposes. See [deployment](#deployment) for notes on how to deploy the project on a live system.
-
+These instructions will get you a copy of the project up and running on your local machine.
 ### Prerequisites
 
 - OSQP Library  
-You can find detailed instructions on using build a osqp library and many tips in its documentation [here](https://osqp.org/docs/get_started/sources.html).
+You can find detailed instructions on using build a osqp library and many tips in its documentation own [here](https://osqp.org/docs/get_started/sources.html).
 
 
 ### Installing
 
-A step by step series of examples that tell you how to get a development env running.
+To get started you need to have binaries build of OSQP in C or you can copy from libs directory in the example.
 
-++
-Say what the step will be
+To install the library you can run the command below.
 
 ```
 go get -u github.com/jerensl/osqp.go
@@ -71,7 +68,7 @@ go get -u github.com/jerensl/osqp.go
 ## 🎈 Usage <a name="usage"></a>
 See [example/](https://github.com/jerensl/osqp.go/example/) for a variety of examples.
 
-**As easy as:**
+**Simple:**
 
 ```go
 package main
